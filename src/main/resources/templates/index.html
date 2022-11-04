@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>SberMegaMarket feed processing</title>
+
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            font-family: Calibri;
+            color: white;
+        }
+
+        .date-info {
+            font-size: smaller;
+
+        }
+
+        .todo {
+            height: 100%;
+            overflow-x: auto;
+            background: darkslateblue;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .todo .todo-canvas {
+            margin: 1rem;
+            width: 600px;
+        }
+
+        .todo .todo-list {
+            background: slateblue;
+            border-radius: 5px;
+            padding: 1rem;
+        }
+
+        .todo .todo-header {
+            padding: 1rem;
+            display: flex;
+            align-items: end;
+        }
+
+        .todo .todo-button {
+            cursor: pointer;
+
+            color: white;
+            width: 115px;
+            height: 45px;
+            font-size: 1rem;
+            border-radius: 50%;
+            border: 0;
+            -webkit-box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.75);
+            box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.75);
+        }
+
+        .todo .todo-button-oneclick {
+            cursor: pointer;
+
+            color: green;
+            width: 115px;
+            height: 45px;
+            font-size: 1rem;
+            border-radius: 10%;
+            border: 0;
+            -webkit-box-shadow: 5px 5px 10px 0px rgba(0,255,0,0.3);
+            -moz-box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.75);
+            box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.75);
+        }
+
+        .todo .todo-button:hover {
+            -webkit-box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.75);
+            box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.75);
+        }
+
+        .todo .todo-button.todo-button-add {
+            background: slateblue;
+        }
+
+        .todo .todo-button.todo-button-add:hover {
+            background: dodgerblue;
+        }
+
+        .todo .todo-button.todo-button-delete {
+            width: 115px;
+            height: 45px;
+            background: gray;
+            font-size: 1rem;
+        }
+
+        .todo .todo-button.todo-button-delete:hover {
+            background: darkgray;
+        }
+
+        .todo .todo-card {
+            display: flex;
+            flex-direction: column;
+
+            padding: 1rem;
+            margin: 1rem 0;
+
+            border-radius: 5px;
+            -webkit-box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.75);
+            box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.75);
+        }
+
+        .todo .todo-card .label,
+        .todo .todo-card .save {
+            width: 100%;
+        }
+
+        .todo .todo-card .label,
+        .todo .todo-card .content,
+        .todo .todo-card .save {
+            font-size: 1rem;
+            margin: .5rem 0;
+            padding: .25rem 0;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="todo">
+    <div class="todo-canvas">
+
+        <div class="todo-header">
+            <h2>Подготовка фидов для Insales и СберМегаМаркет</h2>
+        </div>
+        <div class="todo-list">
+            <div class="todo-card" id="card-1">
+                <li> Okeandra - обработка 1СItems.xls: установка безопасного остатка.
+                    <button class="todo-button todo-button-add" id="button-start-okeandra"
+                            onclick=startCreatingFeedOkeandra()>
+                        Okeandra
+                    </button>
+                    <br><br>
+                    <div><span class="date-info" id="limitedFeedDate"></span>
+                        <a th:href="@{'https://cw52673.tmweb.ru/okeandra/1CItems_feed.xls?' + ${randomVal}}">Скачать</a>
+                    </div>
+            </div>
+
+            <div class="todo-card" id="card-3">
+                <li>СберМегаМаркет - подготовка фида со сроками сборки</li>
+                <button class="todo-button todo-button-add" id="button-start-sber" onclick=startCreatingFeedSber()>
+                    СберМаркет
+                </button>
+                <br>
+                <div><span class="date-info" id="basicFeedForSberDate"></span>
+                    <a th:href="@{'https://cw52673.tmweb.ru/sbermegamarket/resultDeliveryFromOkeandra.xml?'+${randomVal}}"
+                       target="_blank">Скачать</a>
+                </div>
+                <div class="todo-card" id="card-2">
+                    <li>Сбер - Duty Free <br>
+                        (срок отгрузки: с площади 0 дней, если у поставщика: 2 дня) <br>
+                        <button class="todo-button todo-button-add" id="button-start-sber-duty-free"
+                                onclick=startCreatingFeedDutyFree()>
+                            Duty Free
+                        </button>
+                        <br><br>
+                        <div>
+                            <span class="date-info" id="dutyFreeFeedForSberDate"></span>
+                            <a th:href="@{'https://cw52673.tmweb.ru/sbermegamarket/SberDutyFree.xml?' + ${randomVal}}"
+                               target="_blank">Скачать</a>
+                            <br>
+                            Чтобы обновить остатки Duty Free из 1С:
+                    <li> делаем выгрузку из 1С
+                    <li> прожать "Okeandra" -> "СберМаркет" -> "Duty Free"<br>
+                        <br>
+                        Чтобы срочно добавить новый товар:
+                    <li> выгрузка из 1С
+                    <li> прожать "Okeandra" -> "СберМаркет"
+                    <li> импортируем в админку <a href="https://cw52673.tmweb.ru/okeandra/1CItems_feed.xls">этот файл</a>
+                    <li> после завершения загрузки прожать "Duty Free".
+                </div>
+            </div>
+
+                <div class="todo-card" id="card-444">
+                    <li>Отгрузка для GroupPrice.</li>
+                    <button class="todo-button todo-button-add" id="button-groupprice"
+                            onclick=startCreatingFeedGroupPrice()> GroupPrice
+                    </button>
+                    <br>
+                    <div><span class="date-info" id="feedgroupprice"></span><a
+                            th:href="@{'https://cw52673.tmweb.ru/groupprice/groupprice_feed.xml?' + ${randomVal}}"
+                            target="_blank"> Скачать</a>
+                    </div>
+                </div>
+
+                <div class="todo-card" id="card-5">
+                    <li>Отгрузка для Selvis.</li>
+                    <button class="todo-button todo-button-add" id="button-selvis"
+                            onclick=startCreatingFeedSelvis()> Selvis
+                    </button>
+                    <div><span class="date-info" id="feedselvis"></span>
+                        <a th:href="@{'https://cw52673.tmweb.ru/selvis/selvis_feed.xml?' + ${randomVal}}"
+                           target="_blank"> Скачать</a></div>
+                </div>
+
+                <div class="todo-card" id="card-yandex">
+                    <li>Фид для Яндекс Маркета.</li>
+                    <button class="todo-button todo-button-add" id="button-yandex" onclick=startCreatingFeedYandex()>
+                        Яндекс Маркет
+                    </button>
+                    <br>
+                    <div><span class="date-info" id="yandexfeed"></span> <a
+                            th:href="@{'https://cw52673.tmweb.ru/yandex/yandex_feed.xml?'+${randomVal}}"
+                            target="_blank">Скачать</a>
+                    </div>
+                </div>
+
+
+                <div class="todo-card" id="card-22">
+                    <li>Ozon - обновление фида.<br>
+                        <br>
+                        <button class="todo-button todo-button-add" id="button-start-ozon" onclick=startCreatingOzon()>
+                            Ozon
+                        </button>
+                        <br><br>
+                        <div>
+                            При добавлении в Ozon новых товаров - скачать обновленый ассортимент: <br>
+                            В ЛК: Товары-<a href="https://seller.ozon.ru/app/products" target="_blank">Список
+                            товаров</a>
+                            кн. Скачать товары - Товары CSV - prodicts.csv
+                            <br>
+                            и загрузить скаченный файл prodicts.csv сюда: <br><br>
+                            <form method="POST" action="/upload-ozon-items" enctype="multipart/form-data">
+                                <input type="file" name="file"/>
+                                <input type="submit" value="Загрузить"/>
+                            </form>
+                        </div>
+                </div>
+
+                <div class="todo-card" id="card-4">
+                    <li>Отгрузка со Сбера - подготовка фида для отгрузки со склада Сбера.</li>
+                    <button class="todo-button todo-button-delete" id="button-sber-from-sber"
+                            onclick=startCreatingFeedSberFromSber()> Склад Сбера
+                    </button>
+                </div>
+
+                <div class="todo-card" id="card-1">
+                    <li> Все в один клик (в процессе разработки) <br>
+                        <button class="todo-button todo-button-delete" id="superclick"
+                                onclick=startAll()> Запуск
+                        </button>
+                </div>
+
+            </div>
+
+            <div><h3>Файлы</h3></div>
+            <div class="todo-list">
+                <div class="todo-card" id="card-download">
+                    <div>Выгрузка из 1С -> <a th:href="@{'https://cw52673.tmweb.ru/1CItems.xls?' + ${randomVal}}">1CItems.xls</a>
+                        <span class="date-info" id="source_1CItems_xls_date"></span></div>
+                    <div><br></div>
+                    <div>Insales фид (основные товары)-> <a
+                            th:href="@{'https://okeandra.ru/marketplace/79749.xml?'+${randomVal}}"
+                            target="_blank">79749.xml</a></div>
+                    <div>Insales фид (DutyFree) -> <a
+                            th:href="@{'https://okeandra.ru/marketplace/84930.xml?'+${randomVal}}"
+                            target="_blank">84930.xml</a>
+                    </div>
+                    <div>Товары отгружаемые "день в день" -> <a
+                            th:href="@{'https://cw52673.tmweb.ru/sbermegamarket/dayperday.txt?' + ${randomVal}}"
+                            target="_blank">dayperday.txt</a> <span class="date-info" id="dayPerDayFileDate"></span>
+                    </div>
+                    <br>
+                    <div>Озон ассортимент -> <a
+                            th:href="@{'https://cw52673.tmweb.ru/ozon/products.csv?' + ${randomVal}}"
+                            target="_blank">products.csv</a> <span class="date-info"
+                                                                   id="ozonProducts"></span></div>
+                    <div>Озон фид -> <a th:href="@{'https://cw52673.tmweb.ru/ozon/ozon_feed.xml?' + ${randomVal}}"
+                                        target="_blank">ozon_feed.xml</a> <span class="date-info" id="ozonFeed"></span>
+                    </div>
+                    <br>
+                    <div>Фид для товаров отгружаемых со склада Сбера -> <a
+                            th:href="@{'https://cw52673.tmweb.ru/sbermegamarket/resultDeliveryFromSberWarehouse.xml?' + ${randomVal}} "
+                            target="_blank">xml</a> <span class="date-info"
+                                                          id="shipmentFromSberWarehouseFeedDate"></span>
+                    </div>
+                    <div>Товары отгружаемые со склада Сбера -> <a
+                            th:href="@{'https://cw52673.tmweb.ru/sbermegamarket/SberItems.txt?' + ${randomVal}}"
+                            target="_blank">SberItems.txt</a> <span class="date-info"
+                                                                    id="itemsFromSberWarehouseFileDate"></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+</body>
+<script>
+
+    function startAll() {
+        window.location = '/start_all';
+    }
+
+    function startCreatingFeedOkeandra() {
+        window.location = '/create-feed-okeandra';
+    }
+
+    function startCreatingFeedDutyFree() {
+        window.location = '/create-sber-duty';
+    }
+
+    function startCreatingFeedSber() {
+        window.location = '/create-feed-sber';
+    }
+
+    function startCreatingOzon() {
+        window.location = '/create-ozon-feed';
+    }
+
+    function startCreatingFeedSberFromSber() {
+        window.location = '/create-sber-from-sber';
+    }
+
+    function startCreatingFeedGroupPrice() {
+        window.location = '/create-groupprice';
+    }
+
+    function startCreatingFeedSelvis() {
+        window.location = '/create-selvis';
+    }
+
+    function startCreatingFeedYandex() {
+        window.location = '/create-yandex';
+    }
+
+
+
+
+
+</script>
+
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+    $(window).on("load", function () { // When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
+        $.get("/query/1",
+            function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+                $("#source_1CItems_xls_date").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+            }
+        );
+
+        $.get("/query/2", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#limitedFeedDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/3", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#basicFeedForSberDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/4", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#dutyFreeFeedForSberDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/5", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#dayPerDayFileDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/6", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#shipmentFromSberWarehouseFeedDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/7", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#itemsFromSberWarehouseFileDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/ozon1", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#ozonProducts").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/ozon2", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#ozonFeed").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/groupprice", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#feedgroupprice").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+         $.get("/query/selvis", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#feedselvis").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+        $.get("/query/yandex", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#yandexfeed").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+
+    });
+
+
+</script>
+</html>

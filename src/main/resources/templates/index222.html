@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+* {
+  box-sizing: border-box;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+
+html {
+  font-family: Calibri;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+  .col-s-1 {width: 8.33%;}
+  .col-s-2 {width: 16.66%;}
+  .col-s-3 {width: 25%;}
+  .col-s-4 {width: 33.33%;}
+  .col-s-5 {width: 41.66%;}
+  .col-s-6 {width: 50%;}
+  .col-s-7 {width: 58.33%;}
+  .col-s-8 {width: 66.66%;}
+  .col-s-9 {width: 75%;}
+  .col-s-10 {width: 83.33%;}
+  .col-s-11 {width: 91.66%;}
+  .col-s-12 {width: 100%;}
+}
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Подготовка фидов Insales, СберМегаМаркет, ЯндексМаркет, GroupPrice</h1>
+</div>
+
+<div class="row">
+    <div class="col-3 col-s-3 menu">
+        <ul>
+            <li>Insales - безопасный остаток</li>
+            <li>СберМегаМаркет</li>
+            <li>СберМегаМаркет - Duty free</li>
+            <li>GroupPrice</li>
+            <li>Selvis</li>
+            <li>ЯндексМаркет</li>
+        </ul>
+    </div>
+
+    <div class="col-6 col-s-9">
+        <h3>Обновить все фиды</h3>
+        <button class="todo-button todo-button-add" id="button-autostart" onclick=startUpdatingAllFeeds()>START</button>
+    </div>
+
+    <div class="col-3 col-s-12">
+        <div class="aside">
+            <h2>Ozon - обновление остатков в ЛК</h2>
+            <button class="" id="button-start-ozon" onclick=startCreatingOzon()>
+                <div>
+                    При добавлении в Ozon новых товаров - скачать обновленый ассортимент: <br>
+                    В ЛК: Товары-<a href="https://seller.ozon.ru/app/products" target="_blank">Список товаров</a>
+                    кн. Скачать товары - Товары CSV - prodicts.csv
+                    <br>
+                    и загрузить скаченный файл prodicts.csv сюда: <br><br>
+                    <form method="POST" action="/upload-ozon-items" enctype="multipart/form-data">
+                        <input type="file" name="file"/>
+                        <input type="submit" value="Загрузить"/>
+                    </form>
+                </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>Resize the browser window to see how the content respond to the resizing.</p>
+</div>
+
+</body>
+
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+    $(window).on("load", function () { // When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
+        $.get("/query/1",
+            function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+                $("#source_1CItems_xls_date").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+            }
+        );
+
+        $.get("/query/2", function (responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+            $("#limitedFeedDate").text(responseText);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        });
+    });
+
+</script>
+</html>
+
+
