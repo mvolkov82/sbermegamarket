@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class ApplicationStarter {
-    int i;
+    static int i;
 
     public static void main(String[] args) {
         SpringApplication.run(ApplicationStarter.class, args);
